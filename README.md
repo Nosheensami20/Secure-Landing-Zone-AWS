@@ -57,6 +57,7 @@ We switched role to Logging account that was already created under the Security 
 Enabled:
         -Versioning → to keep all versions of log files.
         -Server-side encryption with KMS.
+  
 5.2 Create KMS Key in Logging Account:
 - We created a customer-managed KMS key to encrypt logs. This ensures logs are encrypted at rest and that only approved accounts/services (CloudTrail + management account) can decrypt them. It prevents accidental/malicious tampering.
 
