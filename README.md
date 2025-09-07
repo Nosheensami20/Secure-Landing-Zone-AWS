@@ -1,6 +1,6 @@
 # AWS Secure Landing Zone
 
-This project demonstrates how to build a **Secure Landing Zone** on AWS using different services including AWS Organizations, Service Control Policies (SCPs), centralized logging (S3 + KMS + CloudTrail), and IAM guardrails. This Secure Landing Zone gives an organization a strong, scalable, and auditable base for AWS. 
+A production-ready AWS multi-account landing zone implementation featuring organizational governance, security guardrails, and centralized audit logging following AWS Well-Architected Framework principles.
 
 **Key benefits of this Secure Landing Zone:**
 - Separation of responsibilities across multiple accounts.
@@ -9,20 +9,16 @@ This project demonstrates how to build a **Secure Landing Zone** on AWS using di
 - Strong IAM security controls (password policies, MFA enforcement).
 
 ##**Project Architecture**
-Organization Root (o-xxxxxxxxxx)
-├── Production OU
-├── Sandbox OU
-├── Security OU
-└── Shared Services OU
-Centralized Logging & Guardrails:
-- Org-wide CloudTrail → S3 bucket in Logging Account (with KMS, SSE, Versioning)
-- SCPs at Root/OU enforce:
-  - Deny CloudTrail Deletion
-  - Require MFA for IAM Actions
-  - Restrict to ca-central-1 region
-- IAM Guardrails (per account):
-  - Strong password policy
-  - MFA enforced for all users
+Management Account (Root)
+                    Organization: o-xxxxxxxxxx
+                           │
+        ┌──────────────────┼──────────────────┬──────────────────┐
+        │                 │                  │                  │
+   Security OU       Production OU      Sandbox OU      Shared Services OU
+        │                 │                  │                    │
+  Logging Account   Production Account  Development Account  Shared Services
+   (CloudTrail         (Live             (Dev/Test           Account
+    S3 + KMS)         Workloads)         Environment)      (Common Infra)
 
 ## Step 1. Create AWS Organization
 - Created an AWS Organization in the admin account (management account). 
@@ -54,14 +50,6 @@ The policy forces administrators to use Multi-Factor Authentication (MFA) when m
 3. **Restrict AWS Region (ca-central-1 only)**
 This prevents users from launching resources outside the approved region (ca-central-1) and improves security posture, compliance, and controls cost by keeping all workloads in one place.
 
-## **Testing SCPs**:
-
-Verified that SCPs are working:
-- Try to delete CloudTrail → action should be denied.
-- Try IAM action without MFA → denied.
-- Try launching resource in another region (e.g., us-east-1) → denied.
-
-
 ## Step 5. Centralized Loggging (S3 + KMS + CloudTrail):
 We switched role to Logging account that was already created under the Security OU.
 
@@ -85,11 +73,29 @@ Enabled:
 - Enabled strong password policy (12 characters, upper caase,lower case, symbols, numbers).
 - Enforced MFA for root and IAM users
 
+## Validation Results:
+**Security Control Testing**
+
+- Cross-Account Access Functional: Role switching working properly
+- CloudTrail Deletion Blocked: Attempted deletion denied by SCP
+- MFA Enforcement Working: IAM actions without MFA properly blocked
+- Regional Restrictions Active: Resource creation outside ca-central-1 denied
+
+**Logging Verification**
+
+- S3 Log Delivery: Recent log files appearing within 15 minutes
+- CloudTrail Status: "Logging" status confirmed active
+- Encryption Validation: KMS encryption confirmed on all log files
+
+**Access Pattern Validation**
+
+- Management Account Access: Can assume roles in all member accounts
+- Logging Account Security: Centralized log storage accessible
+- Account Isolation: No unauthorized access between accounts
 
 ## **Future Expansion**
 
--Future enhancements could include
+This landing zone foundation enables additional security and governance capabilties which would be covered in upcoming projets.
 - Organization-wide compliance (AWS Config),
 - Continuous threat detection (GuardDuty), and
 - Network visibility (VPC Flow Logs).
-and these services would be used in upcoming project. 
