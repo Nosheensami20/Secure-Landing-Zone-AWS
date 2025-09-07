@@ -9,24 +9,23 @@ A production-ready AWS multi-account landing zone implementation featuring organ
 - Strong IAM security controls (password policies, MFA enforcement).
 
 ##**Project Architecture**
-Management Account (Root)
-                    Organization: o-xxxxxxxxxx
-                           │
-        ┌──────────────────┼──────────────────┬──────────────────┐
-        │                 │                  │                  │
-   Security OU       Production OU      Sandbox OU      Shared Services OU
-        │                 │                  │                    │
-  Logging Account   Production Account  Development Account  Shared Services
-   (CloudTrail         (Live             (Dev/Test           Account
-    S3 + KMS)         Workloads)         Environment)      (Common Infra)
-
+  - Management Account (Root)
+  - Organization: o-xxxxxxxxxx
+        * Security OU
+        * Production OU
+        * Sandbox OU
+        * Shared Services OU
+  - Org-wide CloudTrail → S3 bucket in Logging Account (with KMS, SSE, Versioning)
+  - Centralized Logging & Guardrails
+  - SCPs at Root enfored on OUs
+  - IAM Guardrails 
+    
 ## Step 1. Create AWS Organization
 - Created an AWS Organization in the admin account (management account). 
-- This allows us to manage **multiple accounts under one root**.  
-
+- This allows us to manage multiple accounts under one root.  
 
 ## Step 2. Create Organizational Units (OUs) and Accounts
-We created **4 OUs** and relevant accounts and mapped them with right OU. Even though only the **Logging account** was actively used in this project, the OU structure prepared us for future growth, separation of duties and follwing best Governent practices. 
+We created **4 OUs** and relevant accounts and mapped them with the relevant OU. Even though only the **Logging account** was actively used in this project, the OU structure prepared us for future growth, separation of duties and follwing best Governent practices. 
 
 - **Production** → For production workloads
 - **Security** → For security-related accounts
