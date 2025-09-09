@@ -1,7 +1,7 @@
 # AWS Secure Landing Zone
 
-A production-ready AWS multi-account landing zone implementation featuring organizational governance, security guardrails, and centralized audit logging following AWS Well-Architected Framework principles.
-
+In this project we have created a multi-account landing zone implementation setup in AWS, featuring organizational governance, security guardrails, and centralized audit logging following AWS Well-Architected Framework principles. In this steup, we used AWS Organizations to create multiple accounts under one management account, each with a specific purpose (like Security, Logging, or Workloads). Service Control Policies (SCPs) are applied at organization level to all these accounts to control the actions an account is allowed/not allowed to perform. With centralized CloudTrail logging, all API calls are recorded to know who did what, when, and from where to enforce that only permissible acts are performed by the users. The centralized logging is enabled in a seprate logging account, to ensure that no other account can access it to modify, delete, or disable it. IAM policies are also enforced to ensure strict security controls are in place and rules are implemented like password policy, MFA requirement to keep the accounts secure. 
+ 
 **Key benefits of this Secure Landing Zone:**
 - Separation of responsibilities across multiple accounts.
 - Centralized logging for auditing and incident response.
@@ -41,7 +41,7 @@ We created **4 OUs** and relevant accounts and mapped them with the relevant OU.
 We created and attached 3 SCPs to secure accounts:
 
 1. **Deny CloudTrail Deletion**
-  This policy prevents anyone from disabling or deleting CloudTrail and ensures centralized logging can never be tampered. Even if an account is accessed by unautohrized user or hacker, CloudTrail can't be deleted or disabled.
+  This policy prevents anyone from disabling or deleting CloudTrail and ensures centralized logging can never be tampered. Even if an account is accessed by unautohrized user or hacker, CloudTrail can't be deleted or disabled. 
 
 2. **Require MFA for IAM Actions**
 The policy forces administrators to use Multi-Factor Authentication (MFA) when managing IAM or assuming roles. This prevents attackers from abusing IAM if credentials are leaked or compromised. 
