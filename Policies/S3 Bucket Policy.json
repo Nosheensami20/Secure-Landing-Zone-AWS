@@ -1,0 +1,76 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "AWSCloudTrailAclCheck",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "cloudtrail.amazonaws.com"
+			},
+			"Action": "s3:GetBucketAcl",
+			"Resource": "arn:aws:s3:::org-central-logs-<account-id>",
+			"Condition": {
+				"StringEquals": {
+					"aws:SourceAccount": "<account-id>"
+				}
+			}
+		},
+		{
+			"Sid": "AWSCloudTrailWrite",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "cloudtrail.amazonaws.com"
+			},
+			"Action": "s3:PutObject",
+			"Resource": "arn:aws:s3:::org-central-logs-<account-id>/AWSLogs/<account-id>/*",
+			"Condition": {
+				"StringEquals": {
+					"aws:SourceAccount": "<account-id>",
+					"s3:x-amz-acl": "bucket-owner-full-control"
+				}
+			}
+		},
+		{
+			"Sid": "AWSCloudTrailWriteOrg",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "cloudtrail.amazonaws.com"
+			},
+			"Action": "s3:PutObject",
+			"Resource": "arn:aws:s3:::org-central-logs-<account-id>/AWSLogs/o-*/*",
+			"Condition": {
+				"StringEquals": {
+					"aws:SourceAccount": "<account-id>",
+					"s3:x-amz-acl": "bucket-owner-full-control"
+				}
+			}
+		},
+		{
+			"Sid": "AllowManagementAccountAccess",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "arn:aws:iam::<account-id>:root"
+			},
+			"Action": [
+				"s3:GetObject",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"arn:aws:s3:::org-central-logs-<account-id>",
+				"arn:aws:s3:::org-central-logs-<account-id>/*"
+			]
+		},
+		{
+			"Sid": "AllowLoggingAccountFullAccess",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "arn:aws:iam::<account-id>:root"
+			},
+			"Action": "s3:*",
+			"Resource": [
+				"arn:aws:s3:::org-central-logs-<account-id>",
+				"arn:aws:s3:::org-central-logs-<account-id>/*"
+			]
+		}
+	]
+}
