@@ -25,20 +25,19 @@ In this project we have created a multi-account landing zone implementation setu
 - This allows us to manage multiple accounts under one root.  
 
 ## Step 2. Create Organizational Units (OUs) and Accounts
-We created **4 OUs** and relevant accounts and mapped them with the relevant OU. Even though only the **Logging account** was actively used in this project, the OU structure prepared us for future growth, separation of duties and follwing best Governent practices. 
+We created **4 OUs**, relevant accounts and mapped them with the OU. Even though only the **Logging account** was actively used in this project, the OU structure prepared us for future growth, separation of duties while follwing best governence practices. 
 
-- **Production** → For production workloads
+- **Production** → For production workloads 
 - **Security** → For security-related accounts
 - **Sandbox** → For developers/test accounts
 - **Shared Services** → For shared resources
 
 ## Step 3. Baseline IAM Roles & Cross-Account Access
-- Every account that we created came with the role `OrganizationAccountAccessRole`.  
-- This role was used to switch from the Management account into the Logging account securely and perform assuming that role like created S3 bucket for storing cloudtrail logs in Logging account. 
-
+- Every account that we created came with the role `OrganizationAccountAccessRole`by default. 
+- This role was used to switch from the Management account into the Logging account securely and other accounts and perform actions assuming that role like created S3 bucket for storing cloudtrail logs in Logging account. 
 
 ## Step 4. Service Control Policies (SCPs)
-We created and attached 3 SCPs to secure accounts:
+Next, we created Service Control Policies to set permission guidrails across all account in the organization. SCPs override the polices attached to any IAM role, user, or group inside the account because these are Organization-wide and are applied to all accounts. For this project, we implemented three SCPs to ensure that we follow best practices of security and compliance, have a system of centralize governance and set stronger boundries than IAM. 
 
 1. **Deny CloudTrail Deletion**
   This policy prevents anyone from disabling or deleting CloudTrail and ensures centralized logging can never be tampered. Even if an account is accessed by unautohrized user or hacker, CloudTrail can't be deleted or disabled. 
@@ -50,7 +49,7 @@ The policy forces administrators to use Multi-Factor Authentication (MFA) when m
 This prevents users from launching resources outside the approved region (ca-central-1) and improves security posture, compliance, and controls cost by keeping all workloads in one place.
 
 ## Step 5. Centralized Loggging (S3 + KMS + CloudTrail):
-We switched role to Logging account that was already created under the Security OU.
+We switched role to Logging account that was already created under the Security OU and created a S3 bucket to log activities from all accounts.
 
 5.1. Create S3 bucket:
 - Created an S3 bucket named as "org-central-logs-<account-id>".
